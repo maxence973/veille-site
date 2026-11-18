@@ -34,12 +34,15 @@ const legende = L.control({ position: "bottomright" });
 legende.onAdd = () => {
   const d = L.DomUtil.create("div", "legende");
   d.innerHTML = Object.values(THEMES).map((t) => `<div><i style="background:${t.hex}"></i>${t.nom}</div>`).join("")
-    + `<div style="margin-top:4px;color:#66758a">pointillé = lieu déduit</div>`;
+    + `<div style="margin-top:4px;color:#66758a">pointillé = lieu déduit ou siège</div>`;
   return d;
 };
 legende.addTo(carte);
 
 // ---------- Utilitaires ----------
+// Position incertaine : pays déduit d'un indice, ou pays du siège de l'entreprise (article sans lieu cité)
+const incertain = (e) => e.precision === "deduit" || e.precision === "source";
+const PRECISION = { deduit: " (déduit)", source: " (siège de l'entreprise, aucun lieu cité)" };
 const echapper = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const sansAccent = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
@@ -65,7 +68,7 @@ function popup(e) {
     <span class="theme-tag" style="color:${t.hex}">${t.nom}</span>
     <h3>${echapper(e.titre)}</h3>
     <div class="meta"><span>${echapper(e.source)}</span><span>${dateRelative(e.date)}</span>
-      <span class="lieu ${e.precision === "deduit" ? "deduit" : ""}">${echapper(e.lieu)}${e.precision === "deduit" ? " (déduit)" : ""}${lieux}</span></div>
+      <span class="lieu ${incertain(e) ? "deduit" : ""}">${echapper(e.lieu)}${PRECISION[e.precision] || ""}${lieux}</span></div>
     ${e.resume ? `<p style="margin-top:8px">${echapper(e.resume)}</p>` : ""}
     ${lien ? `<a class="lire" href="${echapper(lien)}" target="_blank" rel="noopener">Lire l'article →</a>` : ""}
   </div>`;
@@ -106,8 +109,8 @@ function rendre() {
     const t = THEMES[e.theme] || THEMES.autre;
     const m = L.circleMarker([e.lat, e.lon], {
       radius: 7, color: t.hex, weight: 2, fillColor: t.hex,
-      fillOpacity: e.precision === "deduit" ? 0.15 : 0.55,
-      dashArray: e.precision === "deduit" ? "3 3" : null,
+      fillOpacity: incertain(e) ? 0.15 : 0.55,
+      dashArray: incertain(e) ? "3 3" : null,
     }).bindPopup(popup(e), { maxWidth: 360 });
     m.on("popupopen", () => surligner(e.id));
     amas.addLayer(m);
@@ -137,7 +140,7 @@ function rendreListe(visibles) {
     return `<li class="article" data-id="${e.id}" style="--c:${t.hex}">
       <h3>${echapper(e.titre)}</h3>
       <div class="meta"><span>${echapper(e.source)}</span><span>${dateRelative(e.date)}</span>
-        <span class="lieu ${e.precision === "deduit" ? "deduit" : ""}">${e.lieu ? "◉ " + echapper(e.lieu) : "non localisé"}</span></div>
+        <span class="lieu ${incertain(e) ? "deduit" : ""}">${e.lieu ? "◉ " + echapper(e.lieu) + (e.precision === "source" ? " (siège)" : "") : "non localisé"}</span></div>
     </li>`;
   }).join("") : `<li class="vide">Aucun article pour ces filtres.</li>`;
 }
@@ -146,7 +149,7 @@ function synthese(liste) {
   const periode = libellePeriode(joursPeriode());
   if (!liste.length) { $("synthese").textContent = `Aucun article sur la période (${periode}).`; return; }
   const parLieu = {};
-  for (const e of liste) if (e.lieu) parLieu[e.lieu] = (parLieu[e.lieu] || 0) + 1;
+  for (const e of liste) if (e.lieu && e.precision !== "source") parLieu[e.lieu] = (parLieu[e.lieu] || 0) + 1;
   const top = Object.entries(parLieu).sort((a, b) => b[1] - a[1]).slice(0, 3);
   const parTheme = {};
   for (const e of liste) parTheme[e.theme] = (parTheme[e.theme] || 0) + 1;
