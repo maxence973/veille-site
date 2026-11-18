@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Veille Armement</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside id="panneau">
+    <header class="intro">
+      <div class="marque"><span class="point"></span>VEILLE ARMEMENT</div>
+      <h1>Situation défense &amp; armement</h1>
+      <p class="texte-intro">
+        Ce site rassemble automatiquement les derniers articles de vos sources de veille défense. Chaque article est classé par thème et placé sur la carte selon les lieux
+        qu'il cite. Cliquez sur un point ou un article pour le lire.
+      </p>
+      <p id="synthese" class="synthese">Collecte des sources en cours…</p>
+      <dl class="chiffres">
+        <div><dt>Événements</dt><dd id="c-total">—</dd></div>
+        <div><dt>Localisés</dt><dd id="c-loc">—</dd></div>
+        <div><dt>Sources</dt><dd id="c-src">—</dd></div>
+      </dl>
+      <p class="maj">Mis à jour <span id="maj">—</span>
+        · <button id="rafraichir" type="button">Actualiser</button></p>
+    </header>
+
+    <section class="filtres">
+      <input id="recherche" type="search" placeholder="Rechercher (pays, système, industriel…)" autocomplete="off">
+      <div class="periode">
+        <label for="periode">Période couverte</label>
+        <output id="periode-valeur" for="periode">7 derniers jours</output>
+        <input id="periode" type="range" min="0" max="14" step="1" value="4">
+        <div class="graduations"><span>24 h</span><span>3 sem.</span><span>1 an</span></div>
+      </div>
+      <select id="source" aria-label="Source"><option value="">Toutes les sources</option></select>
+      <div id="themes" class="themes"></div>
+    </section>
+
+    <section class="liste">
+      <div class="liste-tete">
+        <span id="liste-titre">Articles dans la zone visible</span>
+        <label class="bascule"><input type="checkbox" id="zone-visible" checked> zone visible</label>
+      </div>
+      <ol id="articles"></ol>
+    </section>
+
+    <details class="etat-sources">
+      <summary>État des sources</summary>
+      <div id="etat-sources"></div>
+    </details>
+  </aside>
+
+  <main id="carte" aria-label="Carte des événements"></main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
