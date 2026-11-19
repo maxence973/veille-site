@@ -60,6 +60,13 @@ function lienSur(url) {
   try { const u = new URL(url); return ["http:", "https:"].includes(u.protocol) ? u.href : null; } catch { return null; }
 }
 
+const LANGUES = { de: "de l'allemand", es: "de l'espagnol", it: "de l'italien", nl: "du néerlandais", pt: "du portugais",
+  pl: "du polonais", uk: "de l'ukrainien", ru: "du russe", sv: "du suédois", no: "du norvégien", da: "du danois",
+  fi: "du finnois", cs: "du tchèque", ja: "du japonais", ko: "du coréen", "zh-CN": "du chinois", ar: "de l'arabe",
+  iw: "de l'hébreu", he: "de l'hébreu", tr: "du turc", el: "du grec" };
+const traduction = (e) => e.titre_original
+  ? `<p class="traduction">Traduit automatiquement ${LANGUES[e.langue] || "d'une langue étrangère"} · titre original : « ${echapper(e.titre_original)} »</p>` : "";
+
 function popup(e) {
   const t = THEMES[e.theme] || THEMES.autre;
   const lien = lienSur(e.url);
@@ -70,6 +77,7 @@ function popup(e) {
     <div class="meta"><span>${echapper(e.source)}</span><span>${dateRelative(e.date)}</span>
       <span class="lieu ${incertain(e) ? "deduit" : ""}">${echapper(e.lieu)}${PRECISION[e.precision] || ""}${lieux}</span></div>
     ${e.resume ? `<p style="margin-top:8px">${echapper(e.resume)}</p>` : ""}
+    ${traduction(e)}
     ${lien ? `<a class="lire" href="${echapper(lien)}" target="_blank" rel="noopener">Lire l'article →</a>` : ""}
   </div>`;
 }
@@ -94,7 +102,7 @@ function filtres() {
     (ignorerTheme || etat.actifs.has(e.theme)) &&
     (!e.date || new Date(e.date) >= limite) &&
     (!src || e.source === src) &&
-    (!q || sansAccent(`${e.titre} ${e.resume} ${e.lieux.join(" ")} ${e.source}`).includes(q));
+    (!q || sansAccent(`${e.titre} ${e.titre_original || ""} ${e.resume} ${e.lieux.join(" ")} ${e.source}`).includes(q));
 }
 
 function rendre() {
@@ -140,6 +148,7 @@ function rendreListe(visibles) {
     return `<li class="article" data-id="${e.id}" style="--c:${t.hex}">
       <h3>${echapper(e.titre)}</h3>
       <div class="meta"><span>${echapper(e.source)}</span><span>${dateRelative(e.date)}</span>
+        ${e.titre_original ? `<span class="trad" title="${echapper(e.titre_original)}">traduit</span>` : ""}
         <span class="lieu ${incertain(e) ? "deduit" : ""}">${e.lieu ? "◉ " + echapper(e.lieu) + (e.precision === "source" ? " (siège)" : "") : "non localisé"}</span></div>
     </li>`;
   }).join("") : `<li class="vide">Aucun article pour ces filtres.</li>`;

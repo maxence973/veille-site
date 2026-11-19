@@ -116,6 +116,8 @@ input[type=search]:focus, select:focus { outline: 1px solid var(--accent); borde
 .meta { font: 11px var(--mono); color: var(--texte-3); display: flex; flex-wrap: wrap; gap: 4px 10px; }
 .meta .lieu { color: var(--texte-2); }
 .meta .deduit { font-style: italic; }
+.meta .trad { border: 1px solid var(--bord); border-radius: 3px; padding: 0 4px; }
+.popup .traduction { margin-top: 8px; font-size: 11.5px; font-style: italic; color: var(--texte-3); }
 .vide { color: var(--texte-3); padding: 20px 10px; font-size: 13px; }
 
 .etat-sources {
