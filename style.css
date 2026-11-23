@@ -166,3 +166,54 @@ input[type=search]:focus, select:focus { outline: 1px solid var(--accent); borde
   #articles { overflow: visible; }
   .legende { display: none; }
 }
+
+/* ---- Rapport du matin ---- */
+.bouton-rapport {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px; width: 100%;
+  margin: 0 0 12px; padding: 9px 12px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--bord); border-radius: 4px;
+  color: var(--texte); font: 500 13px var(--sans); text-align: left;
+}
+.bouton-rapport:hover, .bouton-rapport[aria-expanded="true"] { border-color: var(--accent); }
+.bouton-rapport::before { content: "▤"; color: var(--accent); margin-right: 2px; }
+.bouton-rapport span:first-of-type { flex: 1; }
+.rapport-date { font: 11px var(--mono); color: var(--texte-3); }
+.rapport {
+  position: fixed; top: 0; bottom: 0; right: 0; left: 400px; z-index: 1100;
+  overflow-y: auto; background: var(--fond); padding: 20px 32px 32px;
+}
+.rapport-tete {
+  position: sticky; top: -20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: -20px -32px 16px; padding: 16px 32px; background: var(--fond); border-bottom: 1px solid var(--bord);
+}
+.rapport-tete h2 { margin: 0; flex: 1; font-size: 18px; font-weight: 600; }
+.rapport-tete select, .rapport-tete button {
+  background: var(--surface); color: var(--texte); border: 1px solid var(--bord); border-radius: 4px;
+  padding: 6px 10px; font: 13px var(--sans); cursor: pointer;
+}
+.rapport-tete button:hover { border-color: var(--accent); }
+#rapport-contenu { max-width: 820px; }
+.rapport-intro { margin: 0 0 20px; padding: 12px 14px; background: var(--surface); border-left: 2px solid var(--accent); }
+.rapport-intro b { color: var(--accent); font-weight: 500; }
+.rapport-region { padding: 14px 0; border-bottom: 1px solid var(--bord); }
+.rapport-region.calme { opacity: .6; }
+.rapport-region h3 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 6px; font-size: 15px; }
+.vers-region {
+  background: none; border: 0; padding: 0; color: var(--texte); font: 600 15px var(--sans); cursor: pointer;
+}
+.vers-region:hover { color: var(--accent); text-decoration: underline; }
+.rapport-n { font: 11px var(--mono); color: var(--texte-3); }
+.tendance { font: 11px var(--mono); color: var(--texte-2); }
+.tendance.hausse { color: var(--industrie); }
+.tendance.baisse { color: var(--conflit); }
+.rapport-region p { margin: 0 0 8px; color: var(--texte); }
+.rapport-marquants { margin: 0; padding-left: 18px; color: var(--texte-2); }
+.rapport-marquants li { margin: 4px 0; }
+.rapport-marquants a { color: var(--texte); }
+.rapport-marquants a:hover { color: var(--accent); }
+.rapport-src { display: block; font: 11px var(--mono); color: var(--texte-3); }
+.rapport-methode { max-width: 820px; margin: 20px 0 0; font-size: 12px; color: var(--texte-3); }
+@media (max-width: 760px) {
+  .rapport { left: 0; padding: 16px 16px 24px; }
+  .rapport-tete { margin: -16px -16px 12px; padding: 12px 16px; top: -16px; }
+}

@@ -20,6 +20,9 @@
         qu'il cite. Cliquez sur un point ou un article pour le lire.
       </p>
       <p id="synthese" class="synthese">Collecte des sources en cours…</p>
+      <button id="ouvrir-rapport" class="bouton-rapport" type="button" hidden>
+        <span>Rapport du matin</span><span id="rapport-date" class="rapport-date"></span>
+      </button>
       <dl class="chiffres">
         <div><dt>Événements</dt><dd id="c-total">—</dd></div>
         <div><dt>Localisés</dt><dd id="c-loc">—</dd></div>
@@ -56,6 +59,19 @@
   </aside>
 
   <main id="carte" aria-label="Carte des événements"></main>
+
+  <section id="rapport" class="rapport" hidden aria-labelledby="rapport-titre">
+    <div class="rapport-tete">
+      <h2 id="rapport-titre">Rapport du matin</h2>
+      <select id="rapport-choix" aria-label="Date du rapport"></select>
+      <button id="fermer-rapport" type="button" aria-label="Fermer le rapport">Fermer ✕</button>
+    </div>
+    <div id="rapport-contenu"></div>
+    <p class="rapport-methode">Rapport rédigé automatiquement chaque matin par un algorithme, sans IA : les articles
+      des dernières 24 heures sont comptés par région et comparés à la moyenne des 7 jours précédents ; les sujets
+      en progression sont les noms (systèmes, entreprises, programmes) bien plus cités que d'habitude, et les faits
+      marquants sont les sujets repris par le plus de sources.</p>
+  </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>

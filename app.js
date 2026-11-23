@@ -248,3 +248,58 @@ const urlDonnees = (forcer) => EN_LIGNE ? `evenements.json?t=${Date.now()}` : fo
 $("rafraichir").addEventListener("click", () => charger(urlDonnees(true)));
 
 charger(urlDonnees(false));
+
+// ---------- Rapport du matin ----------
+let rapports = [];
+const dateLongue = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+
+function afficherRapport(r) {
+  const regions = r.regions.map((g) => {
+    const marquants = g.marquants.map((m) => {
+      const lien = lienSur(m.url);
+      const titre = lien ? `<a href="${echapper(lien)}" target="_blank" rel="noopener">${echapper(m.titre)}</a>` : echapper(m.titre);
+      return `<li>${titre}<span class="rapport-src">${echapper(m.source)}${m.nb_sources > 1 ? ` · repris par ${m.nb_sources} sources` : ""}</span></li>`;
+    }).join("");
+    const tendance = g.variation == null ? "" : `<span class="tendance ${g.variation >= 15 ? "hausse" : g.variation <= -15 ? "baisse" : ""}">${g.variation > 0 ? "+" : ""}${g.variation} %</span>`;
+    return `<article class="rapport-region ${g.n ? "" : "calme"}">
+      <h3><button type="button" class="vers-region" data-region="${echapper(g.nom)}" title="Voir sur la carte">${echapper(g.nom)}</button>
+        <span class="rapport-n">${g.n} article${g.n > 1 ? "s" : ""}</span>${tendance}</h3>
+      <p>${g.texte.map(echapper).join(" ")}</p>
+      ${marquants ? `<ul class="rapport-marquants">${marquants}</ul>` : ""}
+    </article>`;
+  }).join("");
+  $("rapport-contenu").innerHTML = `<p class="rapport-intro"><b>${echapper(dateLongue(r.date).replace(/^./, (c) => c.toUpperCase()))}</b> — ${echapper(r.intro)}</p>${regions}`;
+}
+
+function chargerRapports() {
+  fetch(EN_LIGNE ? `rapports.json?t=${Date.now()}` : "/api/rapports").then((r) => r.ok ? r.json() : { rapports: [] })
+    .then((d) => {
+      rapports = d.rapports || [];
+      if (!rapports.length) return;
+      $("ouvrir-rapport").hidden = false;
+      $("rapport-date").textContent = dateLongue(rapports[0].date);
+      $("rapport-choix").innerHTML = rapports.map((r, i) => `<option value="${i}">${echapper(dateLongue(r.date))}</option>`).join("");
+      afficherRapport(rapports[0]);
+    }).catch(() => {});
+}
+
+function basculerRapport(ouvert) {
+  $("rapport").hidden = !ouvert;
+  $("ouvrir-rapport").setAttribute("aria-expanded", String(ouvert));
+  if (ouvert) $("rapport").scrollTop = 0;
+}
+$("ouvrir-rapport").addEventListener("click", () => basculerRapport($("rapport").hidden));
+$("fermer-rapport").addEventListener("click", () => basculerRapport(false));
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("rapport").hidden) basculerRapport(false); });
+$("rapport-choix").addEventListener("change", (ev) => afficherRapport(rapports[Number(ev.target.value)]));
+// Clic sur le nom d'une région : ferme le rapport et cadre la carte sur ses articles
+$("rapport-contenu").addEventListener("click", (ev) => {
+  const b = ev.target.closest(".vers-region");
+  if (!b) return;
+  const r = rapports[Number($("rapport-choix").value) || 0];
+  const lieux = new Set((r.regions.find((g) => g.nom === b.dataset.region)?.pays || []).map((p) => p[0]));
+  const points = etat.evenements.filter((e) => e.lat != null && lieux.has(e.lieu)).map((e) => [e.lat, e.lon]);
+  basculerRapport(false);
+  if (points.length) carte.fitBounds(points, { padding: [40, 40], maxZoom: 5 });
+});
+chargerRapports();
